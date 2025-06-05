@@ -1,32 +1,66 @@
-# Assignments
-These are the assignments for CSE240 at UCSC.  They are:
-- [Assignment1](Assignment1/)
-- [Assignment2](Assignment2/) 
-- [Assignment3](Assignment3/)
-- [Assignment4](Assignment4/)
-- [Assignment5](Assignment5/)
-  
-# Installing the Autograder package
-Install the autograder with `pip3 install autograder-py` on the command line.  
+Implements a general-purpose backward chaining inference system for First-Order Logic (FOL). It supports variable-based reasoning, recursive rule application, and unification.
 
-# Submitting and using the Autograder in CSE 240
+---
+Task 7/
+    -fol_bc.py        # Main inference engine
+    -fol_test.py      # Main script for loading facts/rules and running queries
+    -README.md
 
-Make sure that the autograder is installed on your local machine by
-typing: `python3 -m autograder.cli`.  If you see the `--help` option:
+---
 
-```nil
-python -m autograder.cli
-The autograder CLI package contains several tools for interacting with the autograder.
-The following is a non-exhaustive list of CLI tools.
-Invoke each command with the `--help` option for more details.
+## 🧾 Example Knowledge Base (`fol_test.py`)
+
+```python
+kb.add_fact("Parent(John, Mary)")
+kb.add_fact("Parent(Mary, Sam)")
+kb.add_fact("Female(Mary)")
+
+kb.add_rule("Grandparent(X, Z)", ["Parent(X, Y)", "Parent(Y, Z)"])
+kb.add_rule("Grandmother(X, Z)", ["Grandparent(X, Z)", "Female(X)"])
 ```
-## Using the autograder
 
-The autograder command line interface (cli) is [documented](https://github.com/eriq-augustine/autograder-py).  As a
-student in the class, the main commands you will use are:
+---
 
--   `python3 -m autograder.run.submit`: this will submit an assignment
-    for a particular class and assignment.
--   `python3 -m autograder.run.peek`: this will show you your last submission
--   `python3 -m autograder.run.history`: this will show a summary of all
-    your past submission
+## ✅ Example Queries & Expected Output
+
+### Query 1: `Grandmother(John, Sam)`
+```python
+Query: Grandmother(John, Sam)
+```
+
+**Expected Output:**
+```
+Query: Grandmother(John, Sam)
+No.
+```
+
+**Why?**
+- `John` is a grandparent of `Sam` ✔
+- But `John` is not female X → rule fails.
+
+---
+
+### Query 2: `Grandmother(Mary, Sam)`
+```python
+Query: Grandmother(Mary, Sam)
+```
+
+**Expected Output:**
+```
+Query: Grandmother(Mary, Sam)
+Yes: Grandmother(Mary, Sam)
+```
+
+**Why?**
+- `Mary` is a parent of `Sam` - Correct
+- `John` is a parent of `Mary` - Correct → so `Mary` is a grandparent of `Sam` - Correct
+- `Mary` is female - Correct → passes the `Grandmother` rule.
+
+---
+
+## Note
+
+To reproduce working examples:
+- Use the fact/rule setup above.
+- Run the query `Grandmother(Mary, Sam)` to see successful inference.
+- Try `Grandmother(John, Sam)` to confirm failure handling.
